@@ -1,0 +1,52 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Cargar el archivo CSV (ajusta la ruta si es necesario)
+df = pd.read_csv("Base de Likert(Sheet1).csv", encoding='latin1')
+
+# Crear una columna de actitud total como suma de los reactivos tipo Likert R1-R25
+df['Actitud_Total'] = df[[f'R{i}' for i in range(1, 26)]].sum(axis=1)
+
+# Diccionarios para mapear los valores numéricos a texto
+mappings = {
+    'Sexo': {1: 'Mujer', 2: 'Hombre'},
+    'Escolaridad': {
+        1: 'Primaria', 2: 'Secundaria', 3: 'Técnico', 4: 'Preparatoria',
+        5: 'Licenciatura', 6: 'Maestría', 7: 'Doctorado'
+    },
+    'Estado civil': {1: 'Soltero', 2: 'Noviazgo', 3: 'Casado', 4: 'Unión libre'},
+    'Religión': {1: 'Católica', 2: 'Cristiana', 3: 'Testigo de Jehová', 4: 'No tengo'}
+}
+
+# Aplicar los mapeos
+for col, mapping in mappings.items():
+    df[col] = df[col].map(mapping)
+
+# Configuración de estilo de gráficos
+sns.set(style="whitegrid")
+plt.rcParams['figure.figsize'] = (10, 6)
+
+# Crear subgráficos para cada variable sociodemográfica
+fig, axs = plt.subplots(2, 2, figsize=(18, 12))
+
+# Gráfico por sexo
+sns.barplot(data=df, x='Sexo', y='Actitud_Total', ax=axs[0, 0], ci='sd')
+axs[0, 0].set_title('Actitud Total por Sexo')
+
+# Gráfico por escolaridad
+sns.barplot(data=df, x='Escolaridad', y='Actitud_Total', ax=axs[0, 1], ci='sd')
+axs[0, 1].set_title('Actitud Total por Escolaridad')
+axs[0, 1].tick_params(axis='x', rotation=45)
+
+# Gráfico por estado civil
+sns.barplot(data=df, x='Estado civil', y='Actitud_Total', ax=axs[1, 0], ci='sd')
+axs[1, 0].set_title('Actitud Total por Estado Civil')
+
+# Gráfico por religión
+sns.barplot(data=df, x='Religión', y='Actitud_Total', ax=axs[1, 1], ci='sd')
+axs[1, 1].set_title('Actitud Total por Religión')
+
+# Ajustar espaciado
+plt.tight_layout()
+plt.show()
